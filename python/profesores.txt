@@ -1,0 +1,2 @@
+P-505, Dr. Pedro Infante, pedro@email.com, Backend, C++ y Algoritmos
+P-888, Ing. Laura Soto, laura@email.com, Frontend, Javascript Core
