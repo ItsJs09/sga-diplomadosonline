@@ -1,19 +1,29 @@
+"""
+gestor_sga.py
+Clase GestorSGA: contiene la lógica de negocio del SGA-DO, el manejo de las
+estructuras de datos (Pila para deshacer notas, Cola para certificados) y
+la persistencia de la información en archivos .txt.
+"""
 from __future__ import annotations
 
 import os
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from data_structures import Cola, Pila, RegistroNota
 from models import Alumno, Profesor, ProgramaAcademico, crear_programa
 
+DIRECTORIO_PYTHON: str = os.path.dirname(os.path.abspath(__file__))
+
 
 class GestorSGA:
+    """Orquesta el registro de personas, notas, y la persistencia en archivos."""
+
     ARCHIVO_ALUMNOS = "alumnos.txt"
     ARCHIVO_PROFESORES = "profesores.txt"
     ARCHIVO_CERTIFICADOS = "certificados_pendientes.txt"
 
-    def __init__(self, directorio_datos: str = ".") -> None:
-        self._directorio_datos: str = directorio_datos
+    def __init__(self, directorio_datos: Optional[str] = None) -> None:
+        self._directorio_datos: str = directorio_datos if directorio_datos is not None else DIRECTORIO_PYTHON
         self._alumnos: Dict[str, Alumno] = {}
         self._profesores: Dict[str, Profesor] = {}
         self._pila_notas: Pila[RegistroNota] = Pila()
@@ -21,7 +31,6 @@ class GestorSGA:
 
     def _ruta(self, nombre_archivo: str) -> str:
         return os.path.join(self._directorio_datos, nombre_archivo)
-
 
     # Registro de personas
     def registrar_alumno(self, cedula: str, nombre: str, correo: str, tipo_programa: str) -> Alumno:
@@ -45,8 +54,7 @@ class GestorSGA:
         self._profesores[cedula] = profesor
         return profesor
 
-
-    # Notas + Pila LIFO
+    # Notas + Pila LIFO ("Deshacer" / Ctrl+Z)
     def registrar_nota(self, cedula: str, nota: float) -> None:
         alumno = self._alumnos.get(cedula)
         if alumno is None:
@@ -63,9 +71,13 @@ class GestorSGA:
         alumno.eliminar_ultima_nota()
         return cedula, nota
 
-
     # Cola FIFO (Certificados)
     def generar_cola_certificados(self) -> List[Alumno]:
+        """
+        Filtra a los alumnos aprobados (regla polimórfica de cada programa),
+        los encola en orden de recorrido y los desencola (FIFO) para exportar
+        el reporte a certificados_pendientes.txt.
+        """
         cola: Cola[Alumno] = Cola()
         for alumno in self._alumnos.values():
             if alumno.esta_aprobado():
@@ -90,7 +102,6 @@ class GestorSGA:
                     f"| Programa: {alumno.get_programa()} | Promedio: {alumno.get_promedio():.2f}\n"
                 )
 
-
     # Reportes
     def obtener_reporte_general(self) -> str:
         lineas: List[str] = ["=== ALUMNOS ==="]
@@ -113,8 +124,6 @@ class GestorSGA:
     def listar_profesores(self) -> List[Profesor]:
         return list(self._profesores.values())
 
-
-    # Persistencia en archivos .txt
     def guardar_datos(self) -> None:
         self._guardar_alumnos()
         self._guardar_profesores()

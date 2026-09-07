@@ -1,4 +1,5 @@
 from gestor_sga import GestorSGA
+from models import PROGRAMAS_DISPONIBLES, obtener_nombre_programa_por_opcion
 
 MENU = """
 ========== SGA-DO :: Sistema de Gestión Académica ==========
@@ -13,13 +14,31 @@ MENU = """
 """
 
 
+def seleccionar_programa_academico() -> str:
+    submenu = "\n".join(f"  {numero}. {nombre}" for numero, nombre in PROGRAMAS_DISPONIBLES.items())
+
+    while True:
+        print(f"\nSeleccione el programa académico del alumno:\n{submenu}")
+        entrada = input("Opción (1-3): ").strip()
+
+        try:
+            opcion_num = int(entrada)
+        except ValueError:
+            print("Error: Ingrese un valor numérico válido (1, 2 o 3).")
+            continue
+
+        try:
+            return obtener_nombre_programa_por_opcion(opcion_num)
+        except ValueError as error:
+            print(f"Error: {error}")
+
+
 def opcion_registrar_alumno(gestor: GestorSGA) -> None:
     try:
         cedula = input("Cédula del alumno: ").strip()
         nombre = input("Nombre del alumno: ").strip()
         correo = input("Correo del alumno: ").strip()
-        print("Tipos de programa disponibles: Curso, Diplomado, Bootcamp")
-        tipo_programa = input("Tipo de programa: ").strip()
+        tipo_programa = seleccionar_programa_academico()
         gestor.registrar_alumno(cedula, nombre, correo, tipo_programa)
         print(f"Alumno '{nombre}' registrado exitosamente en el programa '{tipo_programa}'.")
     except ValueError as error:

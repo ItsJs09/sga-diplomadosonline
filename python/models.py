@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -5,13 +6,12 @@ from typing import List
 
 
 class Persona:
-
     def __init__(self, cedula: str, nombre: str, correo: str) -> None:
         self._cedula: str = cedula
         self._nombre: str = nombre
         self._correo: str = correo
 
-    # ---------- Getters ----------
+    # Getters 
     def get_cedula(self) -> str:
         return self._cedula
 
@@ -29,7 +29,6 @@ class Persona:
 
 
 class ProgramaAcademico(ABC):
-
     def __init__(self, nombre_programa: str) -> None:
         self._nombre_programa: str = nombre_programa
 
@@ -99,6 +98,19 @@ def crear_programa(tipo_programa: str) -> ProgramaAcademico:
         "Use 'Curso', 'Diplomado' o 'Bootcamp'."
     )
 
+PROGRAMAS_DISPONIBLES: dict[int, str] = {
+    1: "Curso",
+    2: "Diplomado",
+    3: "Bootcamp",
+}
+
+
+def obtener_nombre_programa_por_opcion(opcion: int) -> str:
+    nombre_programa = PROGRAMAS_DISPONIBLES.get(opcion)
+    if nombre_programa is None:
+        raise ValueError("Opción inválida. Debe seleccionar 1 (Curso), 2 (Diplomado) o 3 (Bootcamp).")
+    return nombre_programa
+
 
 class Alumno(Persona):
 
@@ -143,9 +155,7 @@ class Alumno(Persona):
             f"| Notas: [{notas_str}] | Promedio: {self.get_promedio():.2f} | Estado: {estado}"
         )
 
-
 class Profesor(Persona):
-
     def __init__(self, cedula: str, nombre: str, correo: str, especialidad: str, materia: str) -> None:
         super().__init__(cedula, nombre, correo)
         self._especialidad: str = especialidad
