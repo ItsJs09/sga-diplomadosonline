@@ -1,0 +1,4 @@
+101, Ana Silva, ana@email.com, Curso, 10, 10, 10
+202, Carlos Pérez, carlos@email.com, Diplomado, 14, 14, 13
+303, María Gómez, maria@email.com, Bootcamp, 20, 20, 13
+404, Luis Rojas, luis@email.com, Bootcamp, 14, 15, 14
